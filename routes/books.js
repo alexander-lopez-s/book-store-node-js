@@ -44,16 +44,72 @@ router.get('/', (req, res) => {
 // Get books by ID
 
 router.get('/:id', (req, res) => {
-    const {id} = req.params;
-    console.log(id);
+    const { id } = req.params;
     const bookExist = getBookById(id);
-    if(bookExist) {
+    if (bookExist) {
         res.status(200).json(bookExist);
     } else {
         res.status(404).json({
-            message : `booj with the ${id} does not exist`
+            message: `Book with ID ${id} does not exist`
         });
+    }
+});
+
+// Make a post request
+
+router.post('/', (req, res) => {
+    const { title, author } = req.body;
+    const newBook = {
+        id: String(books.length + 1),
+        title: title,
+        author: author
     };
-})
+
+    books.push(newBook);
+    res.status(201).json(newBook);
+});
+
+// Make a put request
+
+router.put('/:id', (req, res) => {
+    const { id } = req.params;
+    const { title, author } = req.body;
+    const bookExist = getBookById(id);
+
+    if (bookExist) {
+        books.forEach((book, index) => {
+            if (book.id === id) {
+                const updatedBook = {
+                    id: id,
+                    title: title,
+                    author: author
+                };
+                books[index] = updatedBook;
+                res.status(200).json(updatedBook);
+            }
+        });
+    } else {
+        res.status(404).json({
+            message: `Book with ID ${id} does not exist`
+        });
+    }
+});
+
+// Make a delete request
+
+router.delete('/:id', (req, res)=> {
+    const { id } = req.params;
+    const bookExist = getBookById(id);
+    if (bookExist) {
+        books = books.filter((book) => book.id !== id);
+        res.status(200).json({
+            message: 'Book deleted successfully'
+        });
+    } else {
+        res.status(404).json({
+            message: 'Book with ID ${id} does not exist'
+        });
+    }
+});
 
 export default router;
